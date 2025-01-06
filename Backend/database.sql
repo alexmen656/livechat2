@@ -1,0 +1,17 @@
+CREATE DATABASE IF NOT EXISTS livechat;
+USE livechat;
+
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    verification_id CHAR(16) NOT NULL UNIQUE,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS livechat_messages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    author VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
+    type ENUM('user', 'system') NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
