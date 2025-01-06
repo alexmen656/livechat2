@@ -26,25 +26,40 @@ export default {
 </style>-->
 
 <template>
-  <h1>Pirate Live Chat</h1>
-  <router-link to="/room/1/">Room 1</router-link> |
-  <router-link to="/room/2/">Room 2</router-link> |
-  <router-link to="/room/3/">Room 3</router-link> |
-  <div class="live-chat">
-    <div class="messages">
-      <div v-for="message in messages" :key="message.id" :class="message.type">
-        <span class="author">{{ message.author }}: </span>
-        <span class="text">{{ message.message }}</span>
+  <div class="chat-view">
+    <div class="overlay"></div>
+
+    <div class="inner">
+      <div class="heading">
+        <h1>Pirate Live Chat</h1>
+        <div class="rooms">
+          <router-link class="active" to="/room/1/">Room 1</router-link> |
+          <router-link to="/room/2/">Room 2</router-link> |
+          <router-link to="/room/3/">Room 3</router-link>
+        </div>
+        <hr style="width: 100%;">
       </div>
-    </div>
-    <div class="input-container">
-      <input
-        type="text"
-        v-model="newMessage"
-        placeholder="Type your message"
-        @keyup.enter="sendMessage"
-      />
-      <button @click="sendMessage">Send</button>
+      <div class="live-chat">
+        <div class="messages">
+          <div
+            v-for="message in messages"
+            :key="message.id"
+            :class="message.type ? message.type : 'response'"
+          >
+            <span class="author">{{ message.author }}: </span>
+            <span class="text">{{ message.message }}</span>
+          </div>
+        </div>
+        <div class="input-container">
+          <input
+            type="text"
+            v-model="newMessage"
+            placeholder="Type your message"
+            @keyup.enter="sendMessage"
+          />
+          <button @click="sendMessage">Send</button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -121,19 +136,28 @@ html,
   font-family: "Blackpearl", sans-serif !important;
   background: url("@/bg.png") no-repeat center center fixed;
   background-size: cover;
+  background-color: rgba(12, 12, 12, 0.85);
 }
 
 .live-chat {
   display: flex;
   flex-direction: column;
-  height: 80%;
+  height: 85%;
   width: 100%;
-  border: 1px solid #ccc;
+  /* border: 1px solid #ccc;*/
   border-radius: 5px;
   overflow: hidden;
-  /* background: url("@/bg2.webp") no-repeat center center fixed;*/
-  background-color: white;
-  background-size: cover;
+  /* background: url("@/bg2.webp") no-repeat center center fixed;
+  background-color: rgba(12, 12, 12, 0.8);
+  background-size: cover;*/
+  z-index: 1000;
+}
+
+.inner {
+  z-index: 1000;
+  height: 100%;
+  width: 100%;
+  /*padding-top: 5px;*/
 }
 
 .messages {
@@ -149,6 +173,10 @@ html,
 
 .user {
   color: blue;
+}
+
+.response {
+  color: red;
 }
 
 .system {
@@ -178,5 +206,57 @@ button {
 
 h1 {
   text-align: center;
+}
+
+.chat-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(12, 12, 12, 0.8);
+  z-index: 1;
+}
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.heading > h1 {
+  font-size: 48px;
+  color: white;
+  text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+  margin-bottom: 10px;
+}
+
+.rooms {
+  display: flex;
+  justify-content: center;
+  color: white;
+}
+
+.rooms > a {
+  font-size: 1.25rem;
+  color: white;
+  text-decoration: none;
+  margin: 0 10px;
+}
+
+.rooms > a.active {
+  color: red;
+}
+
+.text, .author {
+  font-size: 1.25rem;
 }
 </style>
