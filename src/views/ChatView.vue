@@ -1,44 +1,10 @@
-<!--<template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
-</template>
-
-<script>
-import HelloWorld from './components/HelloWorld.vue'
-
-export default {
-  name: 'App',
-  components: {
-    HelloWorld
-  }
-}
-</script>
-
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>-->
-
 <template>
   <div class="chat-view">
     <div class="overlay"></div>
 
     <div class="inner">
-      <div class="heading">
-        <h1>Pirate Live Chat</h1>
-        <div class="rooms">
-          <router-link class="active" to="/room/1/">Room 1</router-link> |
-          <router-link to="/room/2/">Room 2</router-link> |
-          <router-link to="/room/3/">Room 3</router-link>
-        </div>
-        <hr style="width: 100%;">
-      </div>
+      <SiteHeading></SiteHeading>
+      <hr />
       <div class="live-chat">
         <div class="messages">
           <div
@@ -46,18 +12,31 @@ export default {
             :key="message.id"
             :class="message.type ? message.type : 'response'"
           >
-            <span class="author">{{ message.author }}: </span>
+            <!--            style="margin-bottom: 5px"
+-->
+            <span class="author" :class="message.color"
+              >{{ message.author }}:
+            </span>
             <span class="text">{{ message.message }}</span>
+          </div>
+          <div class="no-messages" v-if="messages.length == 0">
+            No messages yet. Be the first to say something!
           </div>
         </div>
         <div class="input-container">
-          <input
-            type="text"
-            v-model="newMessage"
-            placeholder="Type your message"
-            @keyup.enter="sendMessage"
-          />
-          <button @click="sendMessage">Send</button>
+          <!--  Username: Xerox -->
+          <div class="inner-container">
+            <input
+              type="text"
+              v-model="newMessage"
+              placeholder="Type your message"
+              @keyup.enter="sendMessage"
+            />
+            <button @click="sendMessage">Send</button>
+          </div>
+          <span class="room5-note">
+            PS: In Room 5 there is no AI! Only real people :)</span
+          >
         </div>
       </div>
     </div>
@@ -65,7 +44,12 @@ export default {
 </template>
 
 <script>
+import SiteHeading from "@/components/SiteHeading.vue";
+
 export default {
+  components: {
+    SiteHeading,
+  },
   data() {
     return {
       messages: [],
@@ -74,7 +58,8 @@ export default {
   },
   created() {
     const storedUsername = localStorage.getItem("username");
-    if (!storedUsername) {
+    const verificationId = localStorage.getItem("verification_id");
+    if (!storedUsername || !verificationId) {
       this.$router.push("/");
     }
 
@@ -83,10 +68,14 @@ export default {
       this.fetchMessages();
     }, 1000);
   },
+  beforeUnmount() {
+    window.removeEventListener("resize", this.updateHeadingText);
+  },
   methods: {
     fetchMessages() {
+      const roomId = this.$route.params.roomId;
       this.$axios
-        .get("livechat.php")
+        .get("livechat.php?room_id=" + roomId)
         .then((response) => {
           this.messages = response.data;
         })
@@ -96,10 +85,13 @@ export default {
     },
     sendMessage() {
       if (this.newMessage.trim() !== "") {
+        const roomId = this.$route.params.roomId;
         const message = {
           author: localStorage.getItem("username") ?? "User",
           message: this.newMessage,
           type: "user",
+          room_id: roomId,
+          verification_id: localStorage.getItem("verification_id"),
         };
         this.$axios
           .post("livechat.php", message)
@@ -107,6 +99,10 @@ export default {
             if (response.data.status === "success") {
               this.fetchMessages();
               this.newMessage = "";
+            } else if (response.data.status === "error") {
+              alert(
+                "Message could not be send!\nError: " + response.data.message
+              );
             }
           })
           .catch((error) => {
@@ -118,32 +114,12 @@ export default {
 };
 </script>
 
-<style>
-@font-face {
-  font-family: "Blackpearl";
-  src: url("@/Blackpearl.ttf") format("truetype");
-  font-weight: normal;
-  font-style: normal;
-}
-
-body,
-html,
-#app {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  font-family: "Blackpearl", sans-serif !important;
-  background: url("@/bg.png") no-repeat center center fixed;
-  background-size: cover;
-  background-color: rgba(12, 12, 12, 0.85);
-}
-
+<style scoped>
 .live-chat {
   display: flex;
   flex-direction: column;
-  height: 85%;
-  width: 100%;
+  height: 89%;
+
   /* border: 1px solid #ccc;*/
   border-radius: 5px;
   overflow: hidden;
@@ -151,6 +127,7 @@ html,
   background-color: rgba(12, 12, 12, 0.8);
   background-size: cover;*/
   z-index: 1000;
+  padding: 0 10px;
 }
 
 .inner {
@@ -171,12 +148,12 @@ html,
   margin-bottom: 10px;
 }
 
-.user {
+/*.user > .author {
   color: blue;
-}
+}*/
 
-.response {
-  color: red;
+.text {
+  color: white;
 }
 
 .system {
@@ -185,23 +162,51 @@ html,
 
 .input-container {
   display: flex;
+  flex-direction: column;
   padding: 10px;
-  border-top: 1px solid #ccc;
+  background: rgba(12, 12, 12, 0.85);
+  border-radius: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.7), 0 6px 20px rgba(0, 0, 0, 0.7);
+  width: 100%;
+  /*margin: 10px;*/
+}
+
+input {
+  flex: 1;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 10px !important;
+  /*margin-right: 10px;*/
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  width: 90%;
+}
+
+button {
+  /*padding: 10px 20px;*/
+  font-size: 12px;
+  border: none;
+  border-radius: 5px;
+  background-color: rgba(0, 123, 255, 0.8);
+  color: white;
+  cursor: pointer;
+  height: 100%;
+  width: 5%;
+}
+
+button:hover {
+  background-color: rgba(0, 86, 179, 0.8);
 }
 
 input[type="text"] {
   flex: 1;
   padding: 10px;
   font-size: 16px;
-  border: 1px solid #ccc;
+  border: 1px solid black;
   border-radius: 5px;
-}
-
-button {
-  padding: 10px 20px;
-  font-size: 16px;
-  cursor: pointer;
-  margin-left: 10px;
+  background: black;
+  color: #fff;
 }
 
 h1 {
@@ -214,6 +219,7 @@ h1 {
   align-items: center;
   justify-content: center;
   height: 100vh;
+  overflow: hidden;
 }
 
 .overlay {
@@ -222,41 +228,88 @@ h1 {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(12, 12, 12, 0.8);
+  background-color: rgba(12, 12, 12, 0.9);
   z-index: 1;
 }
 
-.heading {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+.text,
+.author {
+  font-size: 1.25rem;
 }
 
-.heading > h1 {
-  font-size: 48px;
-  color: white;
-  text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+/*.response > .author {
+  color: red;
+}*/
+
+.response,
+.user {
   margin-bottom: 10px;
 }
 
-.rooms {
+.room5-note {
+  color: #fff;
+  text-align: center;
+}
+
+.inner-container {
+  width: 100%;
   display: flex;
-  justify-content: center;
-  color: white;
+  justify-content: space-between;
+  align-items: space-between;
 }
 
-.rooms > a {
-  font-size: 1.25rem;
-  color: white;
-  text-decoration: none;
-  margin: 0 10px;
+hr {
+  margin-top: 0 !important;
 }
 
-.rooms > a.active {
+.red {
   color: red;
 }
 
-.text, .author {
-  font-size: 1.25rem;
+.blue {
+  color: blue;
+}
+
+.green {
+  color: green;
+}
+
+.purple {
+  color: purple;
+}
+
+.orange {
+  color: orange;
+}
+
+.pink {
+  color: pink;
+}
+
+.yellow {
+  color: yellow;
+}
+
+.cyan {
+  color: cyan;
+}
+
+.magenta {
+  color: magenta;
+}
+
+.lime {
+  color: lime;
+}
+
+.brown {
+  color: brown;
+}
+
+.no-messages {
+  color: white;
+  text-align: center;
+  margin-top: 10px;
+  font-size: 1.5rem;
 }
 </style>

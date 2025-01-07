@@ -8,10 +8,11 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS livechat_messages (
+CREATE TABLE IF NOT EXISTS messages (
     id INT AUTO_INCREMENT PRIMARY KEY,
     author VARCHAR(255) NOT NULL,
     message TEXT NOT NULL,
-    type ENUM('user', 'system') NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    room_id INT NOT NULL,
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
