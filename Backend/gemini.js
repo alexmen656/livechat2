@@ -15,48 +15,42 @@ const model = genAI.getGenerativeModel({
 });
 
 (async () => {
-  // Das Skript läuft kontinuierlich in regelmäßigen Abständen
   setInterval(() => {
     logik("1");
-  }, 5000); // Alle 5 Sekunde
+  }, 5000);
   setInterval(() => {
     logik("2");
-  }, 5000); // Alle 5 Sekunde
+  }, 5000);
   setInterval(() => {
     logik("3");
-  }, 5000); // Alle 5 Sekunde
+  }, 5000);
   setInterval(() => {
     logik("4");
-  }, 5000); // Alle 5 Sekunde
+  }, 5000);
 })();
 
 async function logik(roomId) {
-  let lastMessageId = loadLastMessageId(); // Variable zur Überwachung der letzten Nachricht
+  let lastMessageId = loadLastMessageId();
 
   try {
     const messages = await fetchMessages(roomId);
-
-    // Prüfe, ob neue Nachrichten vorhanden sind
     const lastID = messages.length - 1;
+
     if (
       messages.length > 0 &&
       messages[lastID].id !== lastMessageId &&
       messages[lastID].author !== "AI"
     ) {
-      console.log("Neue Nachrichten gefunden!");
-      // Setze die letzte Nachrichten-ID
+      console.log("New messages found!");
       lastMessageId = messages[lastID].id;
       saveLastMessageId(lastMessageId);
-      // Erstelle personalisierte Prompts
       const personalizedPrompts = createPersonalizedPrompts(messages);
 
       for (const prompt of personalizedPrompts) {
-        // Generiere die Antwort
         const result = await model.generateContent([prompt]);
         const generatedText = result.response.text();
-        console.log("Generierter Text:", generatedText);
+        console.log("Generated text:", generatedText);
 
-        // Sende die Antwort an das PHP-Endpoint
         await sendResponseToEndpoint(generatedText, roomId);
       }
     }
@@ -70,7 +64,7 @@ async function fetchMessages(roomId) {
     const response = await axios.get(
       "https://alex.polan.sk/livechat/livechat.php?room_id=" + roomId
     );
-    return response.data; // Assuming the PHP script returns a JSON object with a "messages" array
+    return response.data;
   } catch (error) {
     console.error("Error fetching messages:", error);
     return [];
@@ -79,10 +73,6 @@ async function fetchMessages(roomId) {
 
 function createPersonalizedPrompts(messages) {
   const prompts = [];
-  // Nachrichten nach Autoren gruppieren
-  //const authorsMessages = groupMessagesByAuthor(messages);
-  //console.log(authorsMessages);
-  // Erstellen der personalisierten Prompts für jeden Autor
   const messageText = messages
     .map((msg) => msg.author + ": " + msg.message)
     .join(" ");
@@ -92,27 +82,17 @@ function createPersonalizedPrompts(messages) {
   return prompts;
 }
 
-/*function groupMessagesByAuthor(messages) {
-  return messages.reduce((acc, message) => {
-    if (!acc[message.author]) {
-      acc[message.author] = [];
-    }
-    acc[message.author].push(message);
-    return acc;
-  }, {});
-}*/
-
 async function sendResponseToEndpoint(responseText, roomId) {
   try {
     const data = {
-      author: "AI", // Setze den Absender auf "AI" oder auf den jeweiligen Autor, je nach Bedarf
+      author: "AI",
       message: responseText.replaceAll("<AI: ", "").replaceAll("AI: ", ""),
-      type: "response", // Der Typ kann "response" oder ein anderer Wert sein, um die Nachricht zu kennzeichnen
+      type: "response",
       room_id: roomId,
       verification_id: process.env.VERIFICATION_ID,
     };
 
-    const apiUrl = "https://alex.polan.sk/livechat/livechat.php"; // Dein PHP-Endpoint
+    const apiUrl = "https://alex.polan.sk/livechat/livechat.php";
     const response = await axios.post(apiUrl, data);
 
     if (response.data.status === "success") {

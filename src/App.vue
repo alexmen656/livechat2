@@ -24,7 +24,6 @@ html,
   padding: 0;
   font-family: ui-sans-serif, system-ui, sans-serif, Apple Color Emoji,
     Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
-  /* font-family: "Blackpearl", sans-serif !important;*/
   background: url("@/bg.png") no-repeat center center fixed;
   background-size: cover;
 }

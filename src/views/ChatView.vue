@@ -12,8 +12,6 @@
             :key="message.id"
             :class="message.type ? message.type : 'response'"
           >
-            <!--            style="margin-bottom: 5px"
--->
             <span class="author" :class="message.color"
               >{{ message.author }}:
             </span>
@@ -119,13 +117,8 @@ export default {
   display: flex;
   flex-direction: column;
   height: 89%;
-
-  /* border: 1px solid #ccc;*/
   border-radius: 5px;
   overflow: hidden;
-  /* background: url("@/bg2.webp") no-repeat center center fixed;
-  background-color: rgba(12, 12, 12, 0.8);
-  background-size: cover;*/
   z-index: 1000;
   padding: 0 10px;
 }
@@ -134,7 +127,6 @@ export default {
   z-index: 1000;
   height: 100%;
   width: 100%;
-  /*padding-top: 5px;*/
 }
 
 .messages {
@@ -148,16 +140,8 @@ export default {
   margin-bottom: 10px;
 }
 
-/*.user > .author {
-  color: blue;
-}*/
-
 .text {
   color: white;
-}
-
-.system {
-  color: green;
 }
 
 .input-container {
@@ -168,7 +152,6 @@ export default {
   border-radius: 20px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.7), 0 6px 20px rgba(0, 0, 0, 0.7);
   width: 100%;
-  /*margin: 10px;*/
 }
 
 input {
@@ -177,14 +160,12 @@ input {
   font-size: 16px;
   border: 1px solid #ccc;
   border-radius: 10px !important;
-  /*margin-right: 10px;*/
   background: rgba(255, 255, 255, 0.1);
   color: white;
   width: 90%;
 }
 
 button {
-  /*padding: 10px 20px;*/
   font-size: 12px;
   border: none;
   border-radius: 5px;
@@ -237,10 +218,6 @@ h1 {
   font-size: 1.25rem;
 }
 
-/*.response > .author {
-  color: red;
-}*/
-
 .response,
 .user {
   margin-bottom: 10px;
@@ -256,6 +233,13 @@ h1 {
   display: flex;
   justify-content: space-between;
   align-items: space-between;
+}
+
+.no-messages {
+  color: white;
+  text-align: center;
+  margin-top: 10px;
+  font-size: 1.5rem;
 }
 
 hr {
@@ -304,12 +288,5 @@ hr {
 
 .brown {
   color: brown;
-}
-
-.no-messages {
-  color: white;
-  text-align: center;
-  margin-top: 10px;
-  font-size: 1.5rem;
 }
 </style>

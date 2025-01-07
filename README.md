@@ -31,3 +31,7 @@ Vue.ja
 CSS
 PHP
 Mysql
+
+Todo List:
+Check broken design in StartView.vue
+Show Username in ChatView.vue
