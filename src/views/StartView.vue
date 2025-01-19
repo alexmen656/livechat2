@@ -1,8 +1,11 @@
 <template>
   <div class="start-view">
-    <h1>Pirate Live Chat</h1>
-    <input v-model="username" placeholder="Enter your username" />
-    <button @click="startChat">Start</button>
+    <div class="overlay"></div>
+    <div class="content">
+      <h1>Pirate Live Chat</h1>
+      <input v-model="username" placeholder="Enter your username" />
+      <button @click="startChat">Start</button>
+    </div>
   </div>
 </template>
 
@@ -51,8 +54,9 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .start-view {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -62,10 +66,37 @@ export default {
   background-size: cover;
 }
 
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 6px 20px rgba(0, 0, 0, 0.2);
+  margin: 10px;
+}
+
 h1 {
   font-family: "Blackpearl", sans-serif;
-  color: white;
-  margin-bottom: 20px;
+  color: #333;
+  margin-bottom: 40px;
+  font-size: 48px;
+  margin-top: 10px;
+  text-align: center;
 }
 
 input {
@@ -74,6 +105,10 @@ input {
   margin-bottom: 10px;
   border-radius: 5px;
   border: 1px solid #ccc;
+  width: 100%;
+  display: block;
+  box-sizing: border-box;
+  /*max-width: 300px;*/
 }
 
 button {
@@ -84,6 +119,8 @@ button {
   background-color: #007bff;
   color: white;
   cursor: pointer;
+  width: 100%;
+ /* max-width: 300px;*/
 }
 
 button:hover {

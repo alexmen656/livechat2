@@ -6,7 +6,7 @@
       <SiteHeading></SiteHeading>
       <hr />
       <div class="live-chat">
-        <div class="messages">
+        <div class="messages" ref="messagesContainer" @scroll="handleScroll">
           <div
             v-for="message in messages"
             :key="message.id"
@@ -23,6 +23,13 @@
         </div>
         <div class="input-container">
           <!--  Username: Xerox -->
+          <div
+            class="new-messages-popup"
+            v-if="newMessages"
+            @click="scrollToBottom"
+          >
+            New Messages ↓
+          </div>
           <div class="inner-container">
             <input
               type="text"
@@ -32,9 +39,14 @@
             />
             <button @click="sendMessage">Send</button>
           </div>
-          <span class="room5-note">
-            PS: In Room 5 there is no AI! Only real people :)</span
-          >
+          <div class="foot-notes">
+            <span class="room5-note">
+              Your current username: {{ username }}
+            </span>
+            <span class="room5-note">
+              PS: In Room 5 there is no AI! Only real people :)</span
+            >
+          </div>
         </div>
       </div>
     </div>
@@ -51,7 +63,12 @@ export default {
   data() {
     return {
       messages: [],
+      old_messages: [],
       newMessage: "",
+      username: localStorage.getItem("username") ?? "User",
+      ticker1: 1,
+      ticker2: 1,
+      newMessages: false,
     };
   },
   created() {
@@ -70,16 +87,46 @@ export default {
     window.removeEventListener("resize", this.updateHeadingText);
   },
   methods: {
-    fetchMessages() {
+    fetchMessages(scroll = true) {
       const roomId = this.$route.params.roomId;
       this.$axios
         .get("livechat.php?room_id=" + roomId)
         .then((response) => {
+          /*  if (this.ticker1 == 1) {
+            //alert(this.ticker1);
+            this.scrollToBottom();
+            this.ticker1++;
+          }*/
+          this.old_messages = this.messages;
           this.messages = response.data;
+          /* if (this.ticker2 == 1) {
+            this.scrollToBottom();
+            this.ticker2++;
+          }*/
+        })
+        .then(() => {
+          if (this.ticker2 == 1 || !scroll) {
+            this.scrollToBottom();
+            this.ticker2++;
+          } else if (this.old_messages.length != this.messages.length && scroll) {
+            this.newMessages = true;
+          }
         })
         .catch((error) => {
           console.error("Error fetching messages:", error);
         });
+    },
+    scrollToBottom() {
+      //alert("done");
+      const container = this.$refs.messagesContainer;
+      container.scrollTop = container.scrollHeight;
+      this.handleScroll();
+    },
+    handleScroll() {
+      const container = this.$refs.messagesContainer;
+      if (container.scrollTop + container.clientHeight >= container.scrollHeight) {
+        this.newMessages = false;
+      }
     },
     sendMessage() {
       if (this.newMessage.trim() !== "") {
@@ -95,7 +142,9 @@ export default {
           .post("livechat.php", message)
           .then((response) => {
             if (response.data.status === "success") {
-              this.fetchMessages();
+              this.fetchMessages(false);
+              const container = this.$refs.messagesContainer;
+              container.scrollTop = container.scrollHeight;
               this.newMessage = "";
             } else if (response.data.status === "error") {
               alert(
@@ -150,30 +199,19 @@ export default {
   padding: 10px;
   background: rgba(12, 12, 12, 0.85);
   border-radius: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.7), 0 6px 20px rgba(0, 0, 0, 0.7);
-  width: 100%;
-}
-
-input {
-  flex: 1;
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 10px !important;
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  width: 90%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 6px 20px rgba(0, 0, 0, 0.3);
+  position: relative;
 }
 
 button {
-  font-size: 12px;
+  font-size: 1 16px;
   border: none;
   border-radius: 5px;
   background-color: rgba(0, 123, 255, 0.8);
   color: white;
   cursor: pointer;
-  height: 100%;
   width: 5%;
+  margin-bottom: 10px;
 }
 
 button:hover {
@@ -184,10 +222,11 @@ input[type="text"] {
   flex: 1;
   padding: 10px;
   font-size: 16px;
-  border: 1px solid black;
-  border-radius: 5px;
+  border: none;
   background: black;
-  color: #fff;
+  color: white;
+  border-radius: 10px !important;
+  margin-right: 10px;
 }
 
 h1 {
@@ -223,11 +262,6 @@ h1 {
   margin-bottom: 10px;
 }
 
-.room5-note {
-  color: #fff;
-  text-align: center;
-}
-
 .inner-container {
   width: 100%;
   display: flex;
@@ -240,6 +274,17 @@ h1 {
   text-align: center;
   margin-top: 10px;
   font-size: 1.5rem;
+}
+
+.foot-notes {
+  display: flex;
+}
+
+.room5-note {
+  color: #fff;
+  text-align: center;
+  display: block;
+  width: 50%;
 }
 
 hr {
@@ -288,5 +333,20 @@ hr {
 
 .brown {
   color: brown;
+}
+
+.new-messages-popup {
+  position: absolute;
+  top: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: black;
+  color: red;
+  padding: 5px 10px;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4), 0 6px 20px rgba(0, 0, 0, 0.4);
+  z-index: 1001;
+  font-size: 24px;
+  cursor: pointer;
 }
 </style>

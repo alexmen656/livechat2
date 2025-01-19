@@ -17,18 +17,30 @@ if ($method == 'POST') {
     $data = json_decode(file_get_contents('php://input'), true);
     $username = $data['username'];
 
-    // Generate a verification ID
-    $verificationId = generateVerificationId();
-
-    // Save the user to the database
-    $sql = "INSERT INTO users (username, verification_id) VALUES (?, ?)";
+    // Check if the username is already taken
+    $sql = "SELECT * FROM users WHERE username = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ss", $username, $verificationId);
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-    if ($stmt->execute() === TRUE) {
-        echo json_encode(['status' => 'success', 'verification_id' => $verificationId]);
+    if ($result->num_rows > 0) {
+        // Username is already taken
+        echo json_encode(['status' => 'error', 'message' => 'Username is already taken']);
     } else {
-        echo json_encode(['status' => 'error', 'message' => $stmt->error]);
+        // Generate a verification ID
+        $verificationId = generateVerificationId();
+
+        // Save the user to the database
+        $sql = "INSERT INTO users (username, verification_id) VALUES (?, ?)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ss", $username, $verificationId);
+
+        if ($stmt->execute() === TRUE) {
+            echo json_encode(['status' => 'success', 'verification_id' => $verificationId]);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => $stmt->error]);
+        }
     }
 
     $stmt->close();
