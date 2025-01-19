@@ -86,6 +86,13 @@ export default {
   beforeUnmount() {
     window.removeEventListener("resize", this.updateHeadingText);
   },
+  watch: {
+    "$route.params.roomId": function (newVal, oldVal) {
+      if (newVal !== oldVal) {
+        this.ticker2 = 1;
+      }
+    },
+  },
   methods: {
     fetchMessages(scroll = true) {
       const roomId = this.$route.params.roomId;
@@ -105,10 +112,17 @@ export default {
           }*/
         })
         .then(() => {
+          const container = this.$refs.messagesContainer;
+
           if (this.ticker2 == 1 || !scroll) {
             this.scrollToBottom();
             this.ticker2++;
-          } else if (this.old_messages.length != this.messages.length && scroll) {
+          } else if (
+            this.old_messages.length != this.messages.length &&
+            scroll &&
+            container.scrollHeight > container.clientHeight
+          ) {
+            // alert(container.scrollTop + " + " + container.scrollHeight);
             this.newMessages = true;
           }
         })
@@ -117,14 +131,16 @@ export default {
         });
     },
     scrollToBottom() {
-      //alert("done");
       const container = this.$refs.messagesContainer;
       container.scrollTop = container.scrollHeight;
       this.handleScroll();
     },
     handleScroll() {
       const container = this.$refs.messagesContainer;
-      if (container.scrollTop + container.clientHeight >= container.scrollHeight) {
+      if (
+        container.scrollTop + container.clientHeight >=
+        container.scrollHeight - 2
+      ) {
         this.newMessages = false;
       }
     },
@@ -227,6 +243,7 @@ input[type="text"] {
   color: white;
   border-radius: 10px !important;
   margin-right: 10px;
+  box-sizing: border-box;
 }
 
 h1 {

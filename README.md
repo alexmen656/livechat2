@@ -1,4 +1,22 @@
-# livechat
+# Pirate Live Chat
+
+Pirate Live Chat is a retro-style live chat application where users can communicate with each other in real-time. When no other users are online, an AI user is always available to chat and hang out with you.
+
+## Features
+
+- Real-time messaging with other users
+- AI user available when no other users are online
+- Retro pirate-themed design
+- Responsive design for mobile and desktop
+
+## Technologies Used
+
+- Vue.js for the frontend
+- PHP for the backend
+- MySQL for the database
+- Axios for HTTP requests
+- CSS for styling
+- Gemnini API: For AI user
 
 ## Project setup
 ```
@@ -23,15 +41,6 @@ npm run lint
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
-This is live chat in a pirat-retro style. It is normal live chat so you can write with other users which are currently only. But when there is nomady there, there are 2 AI users which are always online and ara happy the chat and hang out with you!
-
-Technologies used:
-JavaScript
-Vue.ja
-CSS
-PHP
-Mysql
-
-Todo List:
-Check broken design in StartView.vue
-Show Username in ChatView.vue
+# Todo List:
+- Check broken design in StartView.vue _/
+- Show Username in ChatView.vue _/
