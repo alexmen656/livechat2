@@ -5,40 +5,28 @@
         <div class="card chat-app h-100">
           <div id="plist" class="people-list">
             <h1>Live Chat</h1>
-            <hr />
             <ul class="list-unstyled chat-list mt-2 mb-0">
-              <!-- <h3>Group Chats</h3>-->
-              <h3>Rooms</h3>
+              <h3>Group Chats</h3>
+
               <li
                 v-for="chat in chats"
                 class="clearfix"
                 :key="chat"
-                :class="Number(activeChat) == Number(chat.id) ? 'active' : ''"
                 @click="openChat(chat.id)"
               >
                 <img :src="chat.img" alt="avatar" />
                 <div class="about">
-                  <div class="name">
-                    <strong>{{ chat.name }}</strong>
-                  </div>
+                  <div class="name">{{ chat.name }}</div>
                   <div class="status">
-                    <i
-                      class="fa fa-circle"
-                      :class="
-                        chat.description == 'With AI' ? 'online' : 'offline'
-                      "
-                    ></i>
-                    {{ chat.description
-                    }}<!--left 7 mins ago-->
+                    <i class="fa fa-circle offline"></i> left 7 mins ago
                   </div>
                 </div>
               </li>
-              <!--Comming in an update-->
-              <!--<h3>Direct Messages</h3>
+              <h3>Direct Messages</h3>
 
               <li class="clearfix active">
                 <img
-                  src="https://alex.polan.sk/livechat/avatar/avatar2.png"
+                  src="https://bootdey.com/img/Content/avatar/avatar2.png"
                   alt="avatar"
                 />
                 <div class="about">
@@ -47,22 +35,26 @@
                     <i class="fa fa-circle online"></i> online
                   </div>
                 </div>
-              </li>-->
+              </li>
             </ul>
           </div>
           <div class="chat">
             <div class="chat-header clearfix">
               <div class="row">
                 <div class="col-lg-6">
-                  <a>
-                    <img :src="currentChat.img" alt="avatar" />
+                  <a
+                    href="javascript:void(0);"
+                    data-bs-toggle="modal"
+                    data-bs-target="#view_info"
+                  >
+                    <img
+                      src="https://bootdey.com/img/Content/avatar/avatar2.png"
+                      alt="avatar"
+                    />
                   </a>
                   <div class="chat-about">
-                    <h6 class="mb-0">{{ currentChat.name }}</h6>
-                    <small
-                      ><i class="fa fa-circle online"></i>
-                      {{ onlineCount }} people online</small
-                    >
+                    <h6 class="mb-0">Aiden Chavez</h6>
+                    <small>Last seen: 2 hours ago</small>
                   </div>
                 </div>
                 <div class="col-lg-6 text-end">
@@ -80,8 +72,7 @@
                   <a href="javascript:void(0);" class="btn btn-outline-warning"
                     ><i class="fa fa-question"></i
                   ></a>-->
-                  <!--Comming in an Update (maybe)-->
-                  <!-- <div class="dropdown">
+                  <div class="dropdown">
                     <button
                       class="btn btn-secondary dropdown-toggle"
                       type="button"
@@ -100,17 +91,16 @@
                       <li><a class="dropdown-item" href="#">Action 3</a></li>
                     </ul>
                   </div>
-                  -->
                 </div>
               </div>
             </div>
-            <div class="chat-history">
-              <ul class="mb-0" ref="messagesContainer">
-                <!--<li class="clearfix">
+            <div class="chat-history" ref="messagesContainer">
+              <ul class="mb-0">
+                <li class="clearfix">
                   <div class="message-data text-end">
                     <span class="message-data-time">10:10 AM, Today</span>
                     <img
-                      src="https://alex.polan.sk/livechat/avatar/avatar7.png"
+                      src="https://bootdey.com/img/Content/avatar/avatar7.png"
                       alt="avatar"
                     />
                   </div>
@@ -120,65 +110,32 @@
                 </li>
                 <li class="clearfix">
                   <div class="message-data">
-                    <img
-                      src="https://alex.polan.sk/livechat/avatar/avatar7.png"
-                      alt="avatar"
-                    />
                     <span class="message-data-time">10:12 AM, Today</span>
                   </div>
                   <div class="message my-message">Are we meeting today?</div>
-                </li>-->
+                </li>
 
                 <li
                   v-for="message in messages"
                   class="clearfix"
                   :key="message.id"
                 >
-                  <div
-                    class="message-data"
-                    :class="message.author == username ? 'text-end' : ''"
-                  >
-                    <img
-                      v-if="message.author != username"
-                      :src="
-                        'https://alex.polan.sk/livechat/avatar/' +
-                        message.avatar
-                      "
-                      alt="avatar"
-                    />
-                    <span class="message-data-time"
-                      ><strong>{{
-                        // formatTimestamp(message.timestamp)
-                        message.author
-                      }}</strong></span
-                    >
-                    <img
-                      v-if="message.author == username"
-                      :src="
-                        'https://alex.polan.sk/livechat/avatar/' +
-                        message.avatar
-                      "
-                      alt="avatar"
-                    />
+                  <div class="message-data">
+                    <span class="message-data-time">10:15 AM, Today</span>
                   </div>
-                  <div
-                    class="message"
-                    :class="
-                      message.author == username
-                        ? 'other-message float-end'
-                        : 'my-message'
-                    "
-                  >
+                  <div class="message my-message">
                     {{ message.message }}
                   </div>
                 </li>
-                <div class="new-messages" v-if="newMessages">
-                  <button @click="scrollToBottom">New Messages ↓</button>
-                </div>
               </ul>
             </div>
             <div class="chat-message clearfix sticky-bottom">
               <div class="input-group mb-0">
+                <div class="input-group-prepend">
+                  <span @click="sendMessage" class="input-group-text"
+                    ><i class="fa fa-paper-plane"></i
+                  ></span>
+                </div>
                 <input
                   type="text"
                   class="form-control"
@@ -186,11 +143,6 @@
                   v-model="newMessage"
                   @keyup.enter="sendMessage"
                 />
-                <div class="input-group-prepend">
-                  <span @click="sendMessage" class="input-group-text"
-                    ><i class="fa fa-paper-plane"></i
-                  ></span>
-                </div>
               </div>
             </div>
           </div>
@@ -204,7 +156,6 @@
 export default {
   data() {
     return {
-      lastClientHeight: 0,
       messages: [],
       old_messages: [],
       newMessage: "",
@@ -212,97 +163,38 @@ export default {
       ticker1: 1,
       ticker2: 1,
       newMessages: false,
-      activeChat: 1,
-      /* chats: [
-        {
-          id: 1,
-          img: "https://alex.polan.sk/livechat/avatar/avatar1.png",
-          name: "Vincent Porter",
-          description: "w/ AI",
-        },
-        {
-          id: 2,
-          img: "https://alex.polan.sk/livechat/avatar/avatar2.png",
-          name: "Aiden Chavez",
-          description: "w/ AI",
-        },
-        {
-          id: 3,
-          img: "https://alex.polan.sk/livechat/avatar/avatar3.png",
-          name: "Mike Thomas",
-          description: "w/ AI",
-        },
-        {
-          id: 4,
-          img: "https://alex.polan.sk/livechat/avatar/avatar4.png",
-          name: "Christian Kelly",
-          description: "w/ AI",
-        },
-        {
-          id: 5,
-          img: "https://alex.polan.sk/livechat/avatar/avatar5.png",
-          name: "Monica Ward",
-          description: "no AI",
-        },
-        {
-          id: 6,
-          img: "https://alex.polan.sk/livechat/avatar/avatar6.png",
-          name: "Dean Henry",
-          description: "no AI",
-        },
-      ],*/
       chats: [
         {
           id: 1,
-          img: "https://alex.polan.sk/livechat/room/room1.jpg",
-          name: "AI Room 1",
-          description: "With AI",
+          img: "https://bootdey.com/img/Content/avatar/avatar1.png",
+          name: "Vincent Porter",
         },
         {
           id: 2,
-          img: "https://alex.polan.sk/livechat/room/room2.jpg",
-          name: "AI Room 2",
-          description: "With AI",
+          img: "https://bootdey.com/img/Content/avatar/avatar2.png",
+          name: "Aiden Chavez",
         },
         {
           id: 3,
-          img: "https://alex.polan.sk/livechat/room/room3.jpeg",
-          name: "AI Room 3",
-          description: "With AI",
+          img: "https://bootdey.com/img/Content/avatar/avatar3.png",
+          name: "Mike Thomas",
         },
         {
           id: 4,
-          img: "https://alex.polan.sk/livechat/room/room4.jpeg",
-          name: "AI Room 4",
-          description: "With AI",
+          img: "https://bootdey.com/img/Content/avatar/avatar4.png",
+          name: "Christian Kelly",
         },
         {
           id: 5,
-          img: "https://alex.polan.sk/livechat/room/room5.webp",
-          name: "Real Pirates Room 1",
-          description: "Without AI",
+          img: "https://bootdey.com/img/Content/avatar/avatar5.png",
+          name: "Monica Ward",
         },
         {
           id: 6,
-          img: "https://alex.polan.sk/livechat/room/room6.jpeg",
-          name: "Real Pirates Room 2",
-          description: "Without AI",
-        },
-        {
-          id: 7,
-          img: "https://alex.polan.sk/livechat/room/room7.png",
-          name: "Skibidi Toilet Room",
-          description: "Without AI",
-        },
-        {
-          id: 8,
-          img: "https://alex.polan.sk/livechat/room/room8.webp",
-          name: "SpongeBob Room",
-          description: "Without AI",
+          img: "https://bootdey.com/img/Content/avatar/avatar6.png",
+          name: "Dean Henry",
         },
       ],
-      onlineCount: 0,
-      currentChat: {},
     };
   },
   created() {
@@ -311,7 +203,7 @@ export default {
     if (!storedUsername || !verificationId) {
       this.$router.push("/");
     }
-    this.setCurrentChat();
+
     this.fetchMessages();
     setInterval(() => {
       this.fetchMessages();
@@ -324,51 +216,17 @@ export default {
     "$route.params.roomId": function (newVal, oldVal) {
       if (newVal !== oldVal) {
         this.ticker2 = 1;
-        this.setCurrentChat();
       }
     },
   },
   methods: {
-    setCurrentChat() {
-      const chatId = parseInt(this.$route.params.roomId);
-      this.currentChat = this.chats.find((chat) => chat.id === chatId) || {};
-      console.log(this.currentChat);
-    },
-    formatTimestamp(timestamp) {
-      const date = new Date(timestamp);
-      const now = new Date();
-      const options = { hour: "2-digit", minute: "2-digit", hour12: true };
-
-      const isToday = date.toDateString() === now.toDateString();
-      const isYesterday =
-        date.toDateString() ===
-        new Date(now.setDate(now.getDate() - 1)).toDateString();
-
-      if (isToday) {
-        return `Today, ${date.toLocaleTimeString("en-US", options)}`;
-      } else if (isYesterday) {
-        return `Yesterday, ${date.toLocaleTimeString("en-US", options)}`;
-      } else {
-        return `${date.toLocaleDateString("en-US")} ${date.toLocaleTimeString(
-          "en-US",
-          options
-        )}`;
-      }
-    },
     fetchMessages(scroll = true) {
       const roomId = this.$route.params.roomId;
-      this.activeChat = roomId;
       this.$axios
-        .get(
-          "livechat.php?room_id=" +
-            roomId +
-            "&verification_id=" +
-            localStorage.getItem("verification_id")
-        )
+        .get("livechat.php?room_id=" + roomId)
         .then((response) => {
           this.old_messages = this.messages;
-          this.messages = response.data.messages;
-          this.onlineCount = response.data.online_count;
+          this.messages = response.data;
         })
         .then(() => {
           const container = this.$refs.messagesContainer;
@@ -381,11 +239,7 @@ export default {
             scroll &&
             container.scrollHeight > container.clientHeight
           ) {
-            if (this.lastClientHeight == container.scrollTop) {
-              this.scrollToBottom();
-            } else {
-              this.newMessages = true;
-            }
+            this.newMessages = true;
           }
         })
         .catch((error) => {
@@ -393,11 +247,9 @@ export default {
         });
     },
     scrollToBottom() {
-      console.log("scrolling to bottom");
       const container = this.$refs.messagesContainer;
       container.scrollTop = container.scrollHeight;
       this.handleScroll();
-      this.lastClientHeight = container.scrollTop;
     },
     handleScroll() {
       const container = this.$refs.messagesContainer;
@@ -438,7 +290,6 @@ export default {
       }
     },
     openChat(id) {
-      this.activeChat = id;
       this.$router.push("/room/" + id);
     },
   },
@@ -500,11 +351,6 @@ body {
 .people-list .chat-list img {
   width: 45px;
   border-radius: 50%;
-
-  /*NEW*/
-  aspect-ratio: 1/1;
-  object-fit: cover;
-  /* -- */
 }
 
 .people-list img {
@@ -531,10 +377,6 @@ body {
   float: left;
   border-radius: 40px;
   width: 40px;
-  /*NEW*/
-  aspect-ratio: 1/1;
-  object-fit: cover;
-  /* -- */
 }
 
 .chat .chat-header .chat-about {
@@ -554,9 +396,9 @@ body {
   overflow: hidden;
 }
 .chat-history > ul {
-  height: 85%;
+  height: 100%;
   overflow-y: scroll;
-  padding-bottom: 20px !important;
+  padding-bottom: 500px;
 }
 
 .chat .chat-history ul {
@@ -577,20 +419,18 @@ body {
 }
 
 .chat .chat-history .message-data img {
-  /*here*/
   border-radius: 40px;
-  width: 28px;
+  width: 40px;
 }
 
 .chat .chat-history .message-data-time {
   color: #434651;
   padding-left: 6px;
-  padding-right: 6px;
 }
 
 .chat .chat-history .message {
   color: #444;
-  padding: 14px 20px;
+  padding: 18px 20px;
   line-height: 26px;
   font-size: 16px;
   border-radius: 7px;
@@ -599,12 +439,12 @@ body {
 }
 
 .chat .chat-history .my-message {
-  background: #efefef;
+  background: #e8f1f3;
   border-radius: 28px 28px 28px 0 !important;
 }
 
 .chat .chat-history .other-message {
-  background: #e8f1f3;
+  background: #efefef;
   text-align: right;
   border-radius: 28px 28px 0 28px !important;
 }
@@ -714,13 +554,6 @@ body {
 
 h1 {
   text-align: center;
-  margin-bottom: 0 !important;
-  font-family: "0Enchanted_Land", cursive;
-  font-weight: 900;
-}
-
-hr {
-  margin-top: 0.25rem !important;
 }
 
 .dropdown-menu {
@@ -741,21 +574,5 @@ hr {
 
 .dropdown-item:hover {
   background-color: #f1f1f1;
-}
-
-.input-group-text {
-  height: 100%;
-  margin-left: 5px;
-}
-
-.new-messages {
-  position: absolute;
-  bottom: 80px;
-  left: 280px;
-  right: 0;
-  z-index: 1100;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 </style>

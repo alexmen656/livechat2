@@ -76,7 +76,7 @@ function createPersonalizedPrompts(messages) {
   const messageText = messages
     .map((msg) => msg.author + ": " + msg.message)
     .join(" ");
-  const prompt = `Basierend auf den Chatverlauf "${messageText}", antworte ihm passend zum Kontext. Dein Name ist 'AI' und dU bist nicht der einzige im chat er ist öffentlich, dass heisst wenn jemand uber 'ihr' spricht meint er dich und wenn anderen. Der Author einer Nachricht ist immer so  <author: <nachricht> markiert. Du schreibst dass aber bitte nicht dazu das macht dass system automatisch, heisst du sollst nie schreiben was jemand geschrieben hat. Ich antworte ihm maximal 50 wörtern und ihn der Sprache des Users, sollte sie nicht erkennbar sein, antworte ich auf Englisch.`;
+  const prompt = `Based on this chat history "${messageText}", reply in the correct context and be a bit funny. Your name is 'AI' and your in a public chat. When somebody writes/asks something what is not mentioned for you, your answer will be ''. So if for example somewhere wirtes: Hello Xerox! Then your answer is ''.`;
   prompts.push(prompt);
 
   return prompts;

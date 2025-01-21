@@ -4,39 +4,16 @@
     <div class="content">
       <h1>Pirate Live Chat</h1>
       <input v-model="username" placeholder="Enter your username" />
-      <div class="avatar-selection">
-        <h3>Select Your Avatar</h3>
-        <div class="avatars">
-          <img
-            v-for="(avatar, index) in avatars"
-            :key="index"
-            :src="'https://alex.polan.sk/livechat/avatar/'+avatar"
-            :alt="'Avatar ' + (index + 1)"
-            :class="{ selected: selectedAvatar === avatar }"
-            @click="selectAvatar(avatar)"
-          />
-        </div>
-      </div>
       <button @click="startChat">Start</button>
     </div>
   </div>
 </template>
 
-<script>
+<script scoped>
 export default {
   data() {
     return {
       username: "",
-      avatars: [
-        'avatar1.png',
-        'avatar2.png',
-        'avatar3.png',
-        'avatar4.png',
-        'avatar5.png',
-        'avatar6.png',
-        'avatar8.png'
-      ],
-      selectedAvatar: null
     };
   },
   created() {
@@ -47,43 +24,44 @@ export default {
     }
   },
   methods: {
-    selectAvatar(avatar) {
-      this.selectedAvatar = avatar;
-    },
     async startChat() {
-      if (this.username.trim() !== "" && this.selectedAvatar) {
+      if (this.username.trim() !== "") {
         try {
           const response = await this.$axios.post("register.php", {
             username: this.username,
-            avatar: this.selectedAvatar
           });
           if (response.data.status === "success") {
+            if (response.data.verification_id) {
+              localStorage.setItem(
+                "verification_id",
+                response.data.verification_id
+              );
+            }
             localStorage.setItem("username", this.username);
-            localStorage.setItem("selectedAvatar", this.selectedAvatar);
-            localStorage.setItem("verification_id", response.data.verification_id);
             this.$router.push("/room/1/");
           } else {
-            alert("Error: " + response.data.message);
+            alert("Error registering user: " + response.data.message);
           }
         } catch (error) {
-          console.error("Error starting chat:", error);
+          console.error("Error registering user:", error);
+          alert("An error occurred while registering. Please try again.");
         }
       } else {
-        alert("Please enter a username and select an avatar.");
+        alert("Please enter a username");
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style scoped>
 .start-view {
   position: relative;
-  height: 100vh;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  background: #f4f7f6;
+  justify-content: center;
+  height: 100vh;
   background: url("@/bg.png") no-repeat center center fixed;
   background-size: cover;
 }
@@ -94,16 +72,30 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1;
 }
 
 .content {
   position: relative;
-  z-index: 1;
-  background: white;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   padding: 20px;
+  background: rgba(255, 255, 255, 0.7);
   border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 6px 20px rgba(0, 0, 0, 0.2);
+  margin: 10px;
+}
+
+h1 {
+  font-family: "Blackpearl", sans-serif;
+  color: #333;
+  margin-bottom: 40px;
+  font-size: 48px;
+  margin-top: 10px;
   text-align: center;
 }
 
@@ -116,6 +108,7 @@ input {
   width: 100%;
   display: block;
   box-sizing: border-box;
+  /*max-width: 300px;*/
 }
 
 button {
@@ -127,32 +120,10 @@ button {
   color: white;
   cursor: pointer;
   width: 100%;
+ /* max-width: 300px;*/
 }
 
 button:hover {
   background-color: #0056b3;
-}
-
-.avatar-selection {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.avatars {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-
-.avatars img {
-  width: 50px;
-  height: 50px;
-  cursor: pointer;
-  border: 2px solid transparent;
-  border-radius: 50%;
-}
-
-.avatars img.selected {
-  border-color: #007bff;
 }
 </style>

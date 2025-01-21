@@ -16,6 +16,7 @@ if ($method == 'POST') {
     // Get the input data
     $data = json_decode(file_get_contents('php://input'), true);
     $username = $data['username'];
+    $avatar = $data['avatar'];
 
     // Check if the username is already taken
     $sql = "SELECT * FROM users WHERE username = ?";
@@ -32,9 +33,9 @@ if ($method == 'POST') {
         $verificationId = generateVerificationId();
 
         // Save the user to the database
-        $sql = "INSERT INTO users (username, verification_id) VALUES (?, ?)";
+        $sql = "INSERT INTO users (username, verification_id, avatar) VALUES (?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ss", $username, $verificationId);
+        $stmt->bind_param("sss", $username, $verificationId, $avatar);
 
         if ($stmt->execute() === TRUE) {
             echo json_encode(['status' => 'success', 'verification_id' => $verificationId]);
@@ -44,6 +45,8 @@ if ($method == 'POST') {
     }
 
     $stmt->close();
+} else {
+    echo json_encode(['status' => 'error', 'message' => 'Invalid request method']);
 }
 
 $conn->close();

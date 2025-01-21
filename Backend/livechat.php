@@ -7,47 +7,55 @@ include 'config.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 
-$colors = ['blue', 'green', 'purple', 'orange', 'pink', 'yellow', 'cyan', 'magenta', 'lime', 'brown'];
-
 if ($method == 'GET') {
-    // Fetch messages
-    $room_id = isset($_GET['room_id']) ? intval($_GET['room_id']) : 1;
-
-    // Fetch unique users in the room
-    $sql = "SELECT DISTINCT author FROM messages WHERE room_id = ?";
+    $room_id = $_GET['room_id'];
+    $verification_id = $_GET['verification_id'];
+    $sql = "SELECT * FROM users WHERE verification_id = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $room_id);
+    $stmt->bind_param("s", $verification_id);
     $stmt->execute();
     $result = $stmt->get_result();
 
-    $userColors = [];
-    $index = 0;
-    while ($row = $result->fetch_assoc()) {
-        if ($row['author'] === 'AI') {
-            $userColors[$row['author']] = 'red';
-        } else {
-            $userColors[$row['author']] = $colors[$index % count($colors)];
-            $index++;
-        }
-    }
-    $stmt->close();
-
-    // Fetch messages with assigned colors
-    $sql = "SELECT * FROM messages WHERE room_id = ? ORDER BY timestamp ASC";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $room_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    $messages = [];
     if ($result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-            $row['color'] = $userColors[$row['author']];
-            $messages[] = $row;
+        $user = $result->fetch_assoc();
+        $user_id = $user['id'];
+
+        // Update online status
+        $sql = "INSERT INTO user_online_status (user_id, is_online, last_active) VALUES (?, TRUE, NOW())
+                ON DUPLICATE KEY UPDATE is_online = TRUE, last_active = NOW()";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $stmt->close();
+
+        // Fetch messages with user profile pictures
+        $sql = "SELECT messages.*, users.avatar FROM messages 
+            JOIN users ON messages.author = users.username 
+            WHERE room_id = ? ORDER BY timestamp ASC";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $room_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $messages = [];
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $messages[] = $row;
+            }
         }
+
+
+        // Fetch the number of online users
+        $sql = "SELECT COUNT(DISTINCT user_id) as online_count FROM user_online_status 
+                WHERE last_active > NOW() - INTERVAL 10 SECOND";//30 
+        $result = $conn->query($sql);
+        $online_count = $result->fetch_assoc()['online_count'];
+
+        echo json_encode(['messages' => $messages, 'online_count' => $online_count]);
+        $stmt->close();
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Missing Authorization']);
     }
-    echo json_encode($messages);
-    $stmt->close();
 } elseif ($method == 'POST') {
     // Save a new message
     $data = json_decode(file_get_contents('php://input'), true);
@@ -65,7 +73,6 @@ if ($method == 'GET') {
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
-        // User is verified, save the message
         $sql = "INSERT INTO messages (author, message, type, room_id) VALUES (?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("sssi", $author, $message, $type, $room_id);
@@ -75,11 +82,13 @@ if ($method == 'GET') {
         } else {
             echo json_encode(['status' => 'error', 'message' => $stmt->error]);
         }
+
+        $stmt->close();
     } else {
-        // User verification failed
-        echo json_encode(['status' => 'error', 'message' => 'Verification failed']);
+        echo json_encode(['status' => 'error', 'message' => 'Missing Authorization']);
     }
-    $stmt->close();
+} else {
+    echo json_encode(['status' => 'error', 'message' => 'Invalid request method']);
 }
 
 $conn->close();
