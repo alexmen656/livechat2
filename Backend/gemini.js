@@ -1,6 +1,7 @@
 require("dotenv").config();
 const axios = require("axios");
 const fs = require("fs");
+
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const genAI = new GoogleGenerativeAI(process.env.API_KEY);
 
@@ -29,7 +30,6 @@ const model = genAI.getGenerativeModel({
 })();
 
 async function logik(roomId) {
-  console.log("Checking for new messages in room", roomId);
   let lastMessageId = loadLastMessageId();
 
   try {
@@ -62,9 +62,9 @@ async function logik(roomId) {
 async function fetchMessages(roomId) {
   try {
     const response = await axios.get(
-      "https://alex.polan.sk/livechat/livechat.php?room_id=" + roomId + "&verification_id=" + process.env.VERIFICATION_ID
+      "https://alex.polan.sk/livechat/livechat.php?room_id=" + roomId
     );
-    return response.data.messages;
+    return response.data;
   } catch (error) {
     console.error("Error fetching messages:", error);
     return [];
