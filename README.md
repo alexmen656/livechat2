@@ -3,7 +3,9 @@ Pirate Live Chat is a retro-style live chat application where users can communic
 
 ## Demo
 ~~Old demo: [https://www.control-center.eu](https://www.control-center.eu/)~~ \
-New demo: [https://retro-chat.alex.polan.sk](https://retro-chat.alex.polan.sk/)
+New demo: [https://retro-chat.alex.polan.sk](https://retro-chat.alex.polan.sk/) \
+\
+Please note that the AI may not be working since the high seas event has already ended. Unfortunately, I need my free Gemini API limits for other projects.
 
 ## Features
 - Real-time messaging with other users
