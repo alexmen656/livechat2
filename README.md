@@ -1,16 +1,11 @@
 # Pirate Live Chat
-
 Pirate Live Chat is a retro-style live chat application where users can communicate with each other in real-time. When no other users are online, an AI user is always available to chat and hang out with you.
 
-<<<<<<< HEAD
 ## Demo
-~~Old demo: [https://www.control-center.eu](https://www.control-center.eu/)~~
+~~Old demo: [https://www.control-center.eu](https://www.control-center.eu/)~~ \
 New demo: [https://retro-chat.alex.polan.sk](https://retro-chat.alex.polan.sk/)
 
-=======
->>>>>>> parent of abd4965 (Initial commit)
 ## Features
-
 - Real-time messaging with other users
 - AI user available when no other users are online
 - Retro pirate-themed design
